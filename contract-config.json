@@ -2,7 +2,7 @@
   "contractAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
   "network": "localhost",
   "chainId": 31337,
-  "deployedAt": "2026-10-18T15:36:13.044Z",
+  "deployedAt": "2026-10-18T16:53:41.845Z",
   "abi": [
     {
       "anonymous": false,

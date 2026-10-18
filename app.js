@@ -4,7 +4,8 @@
 const DEFAULT_CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const HARDHAT_CHAIN_ID = 31337;
 const HARDHAT_CHAIN_ID_HEX = "0x7a69";
-const HARDHAT_RPC_URL = "http://127.0.0.1:8545";
+const HARDHAT_HOST = window.location.hostname || "127.0.0.1";
+const HARDHAT_RPC_URL = `http://${HARDHAT_HOST}:8545`;
 
 // Hardhat Account #0 (Pre-funded with 10,000 local test ETH)
 const DEMO_PRIVATE_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
@@ -263,7 +264,7 @@ function switchTab(tab) {
   }
 }
 
-// Compute client-side SHA-256 hash using native browser Web Crypto API
+// Compute client-side SHA-256 hash (Works seamlessly on Mobile and Desktop)
 async function calculateSHA256(fileOrBuffer) {
   let arrayBuffer;
   if (fileOrBuffer instanceof Blob) {
@@ -271,9 +272,25 @@ async function calculateSHA256(fileOrBuffer) {
   } else {
     arrayBuffer = fileOrBuffer;
   }
-  const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return "0x" + hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+
+  // 1. Primary: Use ethers.sha256 (Always works on all mobile devices over HTTP & HTTPS)
+  try {
+    if (typeof ethers !== "undefined" && ethers.sha256) {
+      const uint8 = new Uint8Array(arrayBuffer);
+      return ethers.sha256(uint8);
+    }
+  } catch (e) {
+    console.warn("ethers.sha256 failed, falling back to Web Crypto:", e);
+  }
+
+  // 2. Secondary fallback: native browser Web Crypto API (requires HTTPS or localhost)
+  if (window.crypto && window.crypto.subtle) {
+    const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return "0x" + hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  throw new Error("No cryptographic hashing engine available on this device.");
 }
 
 // Handle Notarize File Selection
