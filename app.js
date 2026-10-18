@@ -538,9 +538,18 @@ async function handleNotarizeSubmit() {
   const docName = elements.notarizeDocName.value.trim() || state.notarizeFile?.name || "Document";
 
   try {
+    const isMetaMask = state.walletMode === "metamask";
     elements.btnSubmitNotarize.disabled = true;
-    elements.notarizeBtnText.innerHTML = `<span class="spinner"></span> Confirming with MetaMask...`;
-    showStatus(elements.notarizeStatusAlert, "Please confirm the transaction in MetaMask...", "info");
+    elements.notarizeBtnText.innerHTML = isMetaMask
+      ? `<span class="spinner"></span> Confirming with MetaMask...`
+      : `<span class="spinner"></span> Signing & Submitting...`;
+    showStatus(
+      elements.notarizeStatusAlert,
+      isMetaMask
+        ? "Please confirm the transaction in MetaMask..."
+        : "Signing transaction with Demo Account (10,000 ETH) & broadcasting...",
+      "info"
+    );
 
     const contract = await getContract(true);
 
@@ -623,12 +632,12 @@ async function handleVerifySubmit() {
     if (exists) {
       // AUTHENTIC DOCUMENT CASE
       elements.resultDocName.textContent = docName || "Untitled Document";
-      
+
       const date = new Date(Number(timestamp) * 1000);
-      elements.resultTimestamp.textContent = `${date.toLocaleDateString(undefined, { 
-        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' 
+      elements.resultTimestamp.textContent = `${date.toLocaleDateString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
       })} (Unix: ${timestamp.toString()})`;
-      
+
       elements.resultIssuer.textContent = notarizedBy;
       elements.authenticResultCard.classList.add("active");
     } else {

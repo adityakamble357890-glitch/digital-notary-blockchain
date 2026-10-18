@@ -97,7 +97,7 @@ You can simply open `index.html` in your web browser:
 - Double click `index.html` **OR**
 - Start a local server:
 ```bash
-npx serve .
+c
 ```
 and open `http://localhost:3000` in your browser.
 

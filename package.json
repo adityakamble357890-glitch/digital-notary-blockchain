@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Lightweight, fully functional Digital Notary & Document Verification DApp",
   "scripts": {
-    "node": "hardhat node",
+    "node": "hardhat node --hostname 0.0.0.0",
     "compile": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.js --network localhost",
     "test": "hardhat test",
