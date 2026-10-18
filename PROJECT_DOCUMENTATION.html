@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Notary & Document Verification DApp - Technical Project Report | Aditya Kamble</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --bg: #ffffff;
+      --card-bg: #f8fafc;
+      --border: #e2e8f0;
+      --code-bg: #0f172a;
+      --success: #16a34a;
+      --danger: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background-color: #f1f5f9;
+      line-height: 1.65;
+      padding: 30px 15px;
+    }
+
+    .paper {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 50px 60px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+    }
+
+    .no-print-bar {
+      max-width: 900px;
+      margin: 0 auto 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e293b;
+      color: #ffffff;
+      padding: 14px 24px;
+      border-radius: 10px;
+    }
+
+    .print-btn {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      transition: background 0.2s;
+    }
+
+    .print-btn:hover {
+      background: #4338ca;
+    }
+
+    /* Header styling */
+    .report-header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+
+    .project-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      background: #eef2ff;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .report-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+
+    .meta-item strong {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .meta-item span {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    /* Sections */
+    h2 {
+      font-size: 1.45rem;
+      color: #0f172a;
+      margin: 36px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      color: #1e293b;
+      margin: 22px 0 10px;
+    }
+
+    p, li {
+      font-size: 0.96rem;
+      color: #334155;
+      margin-bottom: 12px;
+    }
+
+    ul, ol {
+      padding-left: 24px;
+      margin-bottom: 16px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* Highlight boxes */
+    .box {
+      background: #f8fafc;
+      border-left: 4px solid var(--primary);
+      padding: 16px 20px;
+      margin: 18px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .box-success {
+      border-left-color: var(--success);
+      background: #f0fdf4;
+    }
+
+    .box-info {
+      border-left-color: #0284c7;
+      background: #f0f9ff;
+    }
+
+    /* Code blocks */
+    pre {
+      background: var(--code-bg);
+      color: #f8fafc;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88em;
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #0f172a;
+    }
+
+    pre code {
+      background: transparent;
+      color: #e2e8f0;
+      padding: 0;
+    }
+
+    .badge-layer {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-fe { background: #dbeafe; color: #1e40af; }
+    .badge-be { background: #fef3c7; color: #92400e; }
+    .badge-sc { background: #dcfce7; color: #166534; }
+
+    /* Print styles */
+    @media print {
+      body {
+        padding: 0;
+        background: #ffffff;
+      }
+      .no-print-bar {
+        display: none !important;
+      }
+      .paper {
+        border: none;
+        box-shadow: none;
+        padding: 20px 0;
+        max-width: 100%;
+      }
+      h2 {
+        page-break-after: avoid;
+      }
+      table, pre, .box {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Action Bar for PDF Generation -->
+  <div class="no-print-bar">
+    <div>
+      <strong>📄 Digital Notary Technical Documentation</strong> &bull; Ready to print/save as PDF
+    </div>
+    <button class="print-btn" onclick="window.print()">
+      <span>🖨️</span> Save as PDF / Print
+    </button>
+  </div>
+
+  <div class="paper">
+    <!-- Header -->
+    <header class="report-header">
+      <span class="project-tag">College Term-Work Technical Report</span>
+      <h1>Digital Notary & Document Verification DApp</h1>
+      <div class="report-subtitle">
+        Decentralized Proof-of-Existence Architecture on Ethereum Blockchain
+      </div>
+
+      <div class="meta-grid">
+        <div class="meta-item">
+          <strong>Lead Developer</strong>
+          <span>Aditya Kamble</span>
+        </div>
+        <div class="meta-item">
+          <strong>Project Domain</strong>
+          <span>Web3 / Blockchain / Cryptography</span>
+        </div>
+        <div class="meta-item">
+          <strong>Target Network</strong>
+          <span>Ethereum Localhost (Hardhat EVM)</span>
+        </div>
+        <div class="meta-item">
+          <strong>Smart Contract</strong>
+          <span>DigitalNotary.sol (Solidity ^0.8.20)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- SECTION 1 -->
+    <section>
+      <h2><span>1.</span> Project Purpose & Problem Statement</h2>
+      <p>
+        In traditional institutions (colleges, corporations, government bodies), verifying certificates, legal deeds, and degrees involves slow manual phone calls, registry lookups, or third-party paid verification services. Furthermore, physical documents and regular digital PDFs are vulnerable to unauthorized editing, Photoshop alterations, and forgery.
+      </p>
+      <div class="box box-info">
+        <strong>The Solution: Cryptographic "Proof-of-Existence" (PoE)</strong><br>
+        This decentralized application (DApp) anchors a cryptographic fingerprint (SHA-256 hash) of any document onto an immutable Ethereum smart contract together with an authoritative timestamp and issuer wallet address. Anyone worldwide can instantly verify if a given file is authentic or tampered with in under 1 second.
+      </div>
+    </section>
+
+    <!-- SECTION 2 -->
+    <section>
+      <h2><span>2.</span> System Architecture: Where is Frontend, Backend & Blockchain?</h2>
+      <p>
+        Unlike conventional Web 2.0 applications (like MERN or Django), this project employs a <strong>decentralized, serverless Web3 architecture</strong>:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Type</th>
+            <th>Files & Technologies</th>
+            <th>Role & Responsibility</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Frontend</strong></td>
+            <td><span class="badge-layer badge-fe">Client-Side</span></td>
+            <td>
+              <code>index.html</code><br>
+              <code>style.css</code><br>
+              <code>app.js</code>
+            </td>
+            <td>
+              Runs directly in the user's web browser. Handles drag-and-drop file uploads, calculates cryptographic SHA-256 hashes locally via Web Crypto API, communicates with MetaMask and Hardhat node via Ethers.js.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Backend</strong></td>
+            <td><span class="badge-layer badge-be">Decentralized</span></td>
+            <td>
+              <strong>No Central Server!</strong><br>
+              Hardhat JSON-RPC Node (<code>:8545</code>)
+            </td>
+            <td>
+              There is no centralized backend (no Python, PHP, or Express backend database). The Ethereum blockchain itself acts as the backend runtime engine (EVM - Ethereum Virtual Machine).
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Blockchain Layer</strong></td>
+            <td><span class="badge-layer badge-sc">Smart Contract</span></td>
+            <td>
+              <code>contracts/DigitalNotary.sol</code><br>
+              (Solidity 0.8.20)
+            </td>
+            <td>
+              Contains business logic and immutable persistent state. Maps document hashes to timestamps, document titles, and wallet addresses. Reverts duplicate registrations.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Dev & Deployment</strong></td>
+            <td>Tooling</td>
+            <td>
+              <code>hardhat.config.js</code><br>
+              <code>scripts/deploy.js</code>
+            </td>
+            <td>
+              Automates contract compilation, testing, deployment to localhost, and exports contract ABI + deployed address into <code>contract-config.json</code>.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SECTION 3 -->
+    <section>
+      <h2><span>3.</span> Which Blockchain is Used & Why is it 100% Free?</h2>
+      
+      <h3>Which Blockchain?</h3>
+      <p>
+        The project runs on an <strong>Ethereum-compatible EVM (Ethereum Virtual Machine) blockchain</strong> hosted locally using the industry-standard <strong>Hardhat Network</strong>.
+      </p>
+      <ul>
+        <li><strong>RPC Endpoint:</strong> <code>http://127.0.0.1:8545</code></li>
+        <li><strong>Chain ID:</strong> <code>31337</code> (standard local Hardhat test network ID)</li>
+        <li><strong>EVM Version:</strong> Paris / London compatibility</li>
+      </ul>
+
+      <h3>Why is it 100% Free? (Zero Gas Fees & Zero Cloud Costs)</h3>
+      <div class="box box-success">
+        <strong>1. Local Node Simulation:</strong> Instead of deploying to Ethereum Mainnet (which requires real USD/ETH for gas fees), Hardhat creates a private, full-featured simulated Ethereum blockchain directly in your computer's RAM.<br><br>
+        <strong>2. Pre-Funded Test Wallets:</strong> Hardhat automatically creates 20 pre-funded test accounts, each initialized with <strong>10,000 test ETH</strong> (simulated money for transaction gas fees).<br><br>
+        <strong>3. Read Calls Cost 0 Gas:</strong> The <code>verifyDocument()</code> function is marked as a <code>view</code> function in Solidity. In Ethereum, querying a view function does NOT change state and therefore costs exactly <strong>0 ETH</strong>!
+      </div>
+    </section>
+
+    <!-- SECTION 4 -->
+    <section>
+      <h2><span>4.</span> How It Works Step-by-Step: The Complete Workflow</h2>
+
+      <h3>Step A: Notarization Workflow (Recording Proof-of-Existence)</h3>
+      <ol>
+        <li>
+          <strong>File Selected:</strong> User drops any document (PDF, PNG, DOCX) into the browser dropzone.
+        </li>
+        <li>
+          <strong>Client-Side SHA-256 Hashing:</strong> The native browser <code>window.crypto.subtle.digest("SHA-256", arrayBuffer)</code> processes the binary file into a unique 256-bit hexadecimal digest (prefixed with <code>0x</code>, resulting in a 66-character <code>bytes32</code> string).<br>
+          <em>Crucial Security Note: The document itself is NEVER uploaded across the internet. Only its hash is shared.</em>
+        </li>
+        <li>
+          <strong>Transaction Submission:</strong> User clicks "Notarize on Blockchain". Ethers.js invokes the smart contract method:
+          <pre><code>notarizeDocument(bytes32 docHash, string memory docName)</code></pre>
+        </li>
+        <li>
+          <strong>Wallet Signature:</strong> MetaMask (or the built-in demo wallet) signs the transaction using the user's private key and broadcasts it to the local node.
+        </li>
+        <li>
+          <strong>Blockchain State Mutation:</strong> The smart contract validates that the hash hasn't been registered yet, saves the block timestamp (<code>block.timestamp</code>), caller address (<code>msg.sender</code>), and title into its storage mapping, and emits a <code>DocumentNotarized</code> event.
+        </li>
+      </ol>
+
+      <h3>Step B: Verification Workflow (Authenticity vs Tampering)</h3>
+      <ol>
+        <li>
+          <strong>Target File Uploaded:</strong> The examiner or verifier uploads the document they want to inspect.
+        </li>
+        <li>
+          <strong>Recalculate Hash:</strong> The browser calculates the SHA-256 digest of the uploaded file on the spot.
+        </li>
+        <li>
+          <strong>Query Smart Contract:</strong> Ethers.js invokes the read-only view method:
+          <pre><code>(bool exists, uint256 timestamp, string memory docName, address notarizedBy) = verifyDocument(docHash);</code></pre>
+        </li>
+        <li>
+          <strong>Evaluation:</strong>
+          <ul>
+            <li><strong>If <code>exists == true</code>:</strong> Displays green <strong>'✅ Authentic Document'</strong> with the exact certification timestamp and signer address.</li>
+            <li><strong>If <code>exists == false</code>:</strong> Displays red <strong>'❌ Unverified / Modified Document'</strong>. Even if a single character or punctuation mark was changed, the cryptographic Avalanche Effect alters the hash completely, exposing any tampering immediately!</li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+
+    <!-- SECTION 5 -->
+    <section>
+      <h2><span>5.</span> How Data is Stored: Why Hash instead of the Full File?</h2>
+      <p>
+        A frequent question from professors is: <em>"Where is the actual PDF stored on the blockchain?"</em>
+      </p>
+      <div class="box">
+        <strong>The Golden Rule of Blockchain Engineering:</strong><br>
+        Blockchains are designed for <strong>consensus and state verification</strong>, NOT large binary file storage.
+        <ul>
+          <li>A typical PDF is 2 MB to 20 MB. Storing 1 MB on public Ethereum costs over $10,000 in gas fees!</li>
+          <li>Storing a <strong>SHA-256 hash</strong> requires only <strong>32 bytes</strong> (`bytes32` in Solidity).</li>
+          <li>Because SHA-256 is mathematically collision-resistant, a 32-byte hash proves the integrity of a 500-page document with 100% cryptographic certainty!</li>
+        </ul>
+      </div>
+
+      <h3>Solidity Storage Structure:</h3>
+      <pre><code>struct Record {
+    bytes32 docHash;        // 32-byte cryptographic digest
+    string docName;         // Human-readable title
+    uint256 timestamp;      // UNIX timestamp (seconds since 1970)
+    address notarizedBy;    // Ethereum public address of signer
+    bool exists;            // Boolean existence flag
+}
+
+mapping(bytes32 => Record) private documents;</code></pre>
+    </section>
+
+    <!-- SECTION 6 -->
+    <section>
+      <h2><span>6.</span> Technologies & Languages Used</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Technology</th>
+            <th>Category</th>
+            <th>Version / Specs</th>
+            <th>Why Chosen?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Solidity</strong></td>
+            <td>Smart Contract Language</td>
+            <td><code>^0.8.20</code></td>
+            <td>Primary language for EVM smart contracts; built-in overflow protection and structured custom errors.</td>
+          </tr>
+          <tr>
+            <td><strong>Hardhat</strong></td>
+            <td>Ethereum Dev Framework</td>
+            <td><code>^2.22.0</code></td>
+            <td>Provides local blockchain node, automated compilation, Mocha/Chai test runner, and scripting environment.</td>
+          </tr>
+          <tr>
+            <td><strong>Ethers.js</strong></td>
+            <td>Web3 Library</td>
+            <td><code>v6.13.2</code> (UMD)</td>
+            <td>Connects the HTML/JS frontend to the Ethereum node via JSON-RPC, manages providers and contract instances.</td>
+          </tr>
+          <tr>
+            <td><strong>Web Cryptography API</strong></td>
+            <td>Client Hashing</td>
+            <td><code>crypto.subtle.digest</code></td>
+            <td>Built directly into modern browsers; hashes large binary files in milliseconds without third-party dependencies.</td>
+          </tr>
+          <tr>
+            <td><strong>HTML5 & CSS3</strong></td>
+            <td>Frontend Styling</td>
+            <td>Responsive Vanilla CSS</td>
+            <td>Custom dark glassmorphic design system with zero external styling frameworks for lightweight performance.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SECTION 7 -->
+    <section>
+      <h2><span>7.</span> Top 5 Viva / Oral Exam Questions & Answers</h2>
+
+      <div class="box box-info">
+        <strong>Q1: What happens if an attacker modifies just one space or digit in the document?</strong><br>
+        <strong>A:</strong> Due to the cryptographic <em>Avalanche Effect</em> in SHA-256, changing even a single bit in the input produces a completely unrecognizable hash. When queried, the smart contract returns <code>exists = false</code>, immediately triggering the red Unverified status.
+      </div>
+
+      <div class="box box-info">
+        <strong>Q2: Can someone notarize the same document twice with a different name?</strong><br>
+        <strong>A:</strong> No. The smart contract contains the check: <code>require(!documents[docHash].exists, "Document has already been notarized");</code>. The primary key is the document hash, ensuring each document has a unique, first-timestamped record.
+      </div>
+
+      <div class="box box-info">
+        <strong>Q3: Is the document content exposed publicly on the blockchain?</strong><br>
+        <strong>A:</strong> No. Only the cryptographic hash (a one-way mathematical digest) is stored. It is mathematically impossible to reverse-engineer or extract the original document content from the SHA-256 hash.
+      </div>
+
+      <div class="box box-info">
+        <strong>Q4: Why does verifying a document not require paying gas fees?</strong><br>
+        <strong>A:</strong> Verification queries a Solidity <code>view</code> function. In Ethereum, view functions only read data from the local node's copy of the blockchain and do not create or alter any state, so no gas or wallet transaction is needed.
+      </div>
+
+      <div class="box box-info">
+        <strong>Q5: Can someone alter or delete an already notarized document record?</strong><br>
+        <strong>A:</strong> No. Blockchains are append-only distributed ledgers. The smart contract intentionally does not include any delete or update methods, making the notarization permanently immutable.
+      </div>
+    </section>
+
+    <!-- SECTION 8 -->
+    <section>
+      <h2><span>8.</span> Step-by-Step Terminal Commands to Start Project</h2>
+      <pre><code># 1. Install dependencies
+npm install
+
+# 2. Run automated test suite (3 passing tests)
+npx hardhat test
+
+# 3. Start local simulated blockchain node (Terminal 1)
+npx hardhat node
+
+# 4. Deploy smart contract to localhost (Terminal 2)
+npx hardhat run scripts/deploy.js --network localhost
+
+# 5. Serve frontend web app
+npx serve . -l 3000</code></pre>
+    </section>
+
+    <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.88rem;">
+      Digital Notary & Document Verification DApp &bull; College Term-Work Project &bull; Developed by <strong>Aditya Kamble</strong>
+    </footer>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Notary & Document Verification | Blockchain Term-Work</title>
+  <meta name="description" content="Decentralized Digital Notary and Document Verification system built on Ethereum blockchain using Solidity and Hardhat.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Ethers.js v6 UMD CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">📜</div>
+        <div>
+          <h1>NotaryChain</h1>
+          <div class="subtitle">Decentralized Document Verification &bull; By <strong>Aditya Kamble</strong></div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="network-badge" id="networkBadge">
+          <span class="network-dot" id="networkDot"></span>
+          <span id="networkText">Localhost 8545</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="useDemoWalletBtn" title="Switch between Demo Account and MetaMask">
+          <span>⚡</span>
+          <span id="demoWalletBtnText">Use Local Demo Wallet</span>
+        </button>
+        <button class="btn btn-primary" id="connectWalletBtn">
+          <span>🦊</span>
+          <span id="connectBtnText">Connect MetaMask</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Contract Config Bar -->
+    <div class="config-bar">
+      <div class="config-item">
+        <span>📍 <strong>Contract Address:</strong></span>
+        <input 
+          type="text" 
+          id="contractAddressInput" 
+          class="config-input" 
+          placeholder="0x5FbDB2315678afecb367f032d93F642f64180aa3" 
+          title="DigitalNotary contract address on local network"
+        />
+        <button class="btn btn-secondary btn-sm" id="saveContractBtn" title="Apply address">Apply</button>
+      </div>
+      <div class="config-item">
+        <span id="activeModeText">⚡ Active Wallet: <strong>Local Demo Account (No MetaMask needed)</strong></span>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+      <span class="hero-tag">Blockchain Term-Work Demo &bull; Made by Aditya Kamble</span>
+      <h2>Immutable Proof-of-Existence</h2>
+      <p>
+        Certify file authenticity and ownership using cryptographic SHA-256 hashes anchored securely onto the Ethereum blockchain.
+      </p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav" role="tablist">
+      <button class="tab-btn active" id="tabNotarize" data-tab="notarize-panel" role="tab" aria-selected="true">
+        <span>📝</span> Notarize Document
+      </button>
+      <button class="tab-btn" id="tabVerify" data-tab="verify-panel" role="tab" aria-selected="false">
+        <span>🔍</span> Verify Document
+      </button>
+    </div>
+
+    <!-- MAIN NOTARIZE PANEL -->
+    <section class="tab-content active" id="notarize-panel" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><span>🛡️</span> Notarize New Document</h3>
+          <p class="card-desc">
+            Upload any file to compute its client-side SHA-256 hash. The file itself remains private on your machine; only its cryptographic fingerprint is permanently recorded on-chain with a timestamp.
+          </p>
+        </div>
+
+        <!-- Drag & Drop Area -->
+        <div class="dropzone" id="notarizeDropzone">
+          <input type="file" id="notarizeFileInput" />
+          <div class="dropzone-icon">📁</div>
+          <div class="dropzone-title">Click to upload or drag & drop file</div>
+          <div class="dropzone-hint">Supports PDF, DOCX, TXT, PNG, JPG, or any binary file</div>
+        </div>
+
+        <!-- Quick Demo Helpers -->
+        <div class="demo-buttons">
+          <span>Need a quick test file?</span>
+          <button class="btn btn-secondary btn-sm" id="createSampleFileBtn">
+            📄 Generate Sample Degree.pdf
+          </button>
+        </div>
+
+        <!-- File Details & Hash Preview -->
+        <div class="file-preview" id="notarizeFilePreview">
+          <div class="preview-row">
+            <span class="preview-label">File Name:</span>
+            <span class="preview-value" id="notarizeFileName">-</span>
+          </div>
+          <div class="preview-row">
+            <span class="preview-label">File Size:</span>
+            <span class="preview-value" id="notarizeFileSize">-</span>
+          </div>
+          <div class="form-group" style="margin-top: 10px;">
+            <label class="form-label" for="notarizeDocName">Document Title / Label</label>
+            <input 
+              type="text" 
+              id="notarizeDocName" 
+              class="form-control" 
+              placeholder="e.g. Aditya_Degree_Certificate_2026.pdf" 
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Calculated SHA-256 Hash (bytes32):</label>
+            <div class="hash-box">
+              <span id="notarizeFileHash">0x...</span>
+              <button class="copy-btn" id="copyNotarizeHash" title="Copy Hash">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert / Status -->
+        <div class="alert" id="notarizeStatusAlert"></div>
+
+        <!-- Action Button -->
+        <div class="action-bar">
+          <button class="btn btn-primary" id="btnSubmitNotarize" disabled>
+            <span>✍️</span>
+            <span id="notarizeBtnText">Notarize on Blockchain</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN VERIFY PANEL -->
+    <section class="tab-content" id="verify-panel" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><span>🔎</span> Verify Document Integrity</h3>
+          <p class="card-desc">
+            Upload a document to recalculate its SHA-256 hash and query the smart contract. Even a 1-character modification will produce a completely different hash and result in an Unverified / Modified status.
+          </p>
+        </div>
+
+        <!-- Drag & Drop Area for Verification -->
+        <div class="dropzone" id="verifyDropzone">
+          <input type="file" id="verifyFileInput" />
+          <div class="dropzone-icon">⚖️</div>
+          <div class="dropzone-title">Click to upload file to verify</div>
+          <div class="dropzone-hint">Upload the original or modified document to check authenticity</div>
+        </div>
+
+        <!-- Or Paste Hash directly -->
+        <div class="form-group" style="margin-top: 18px;">
+          <label class="form-label" for="verifyHashInput">Or inspect directly by SHA-256 Hash (bytes32):</label>
+          <input 
+            type="text" 
+            id="verifyHashInput" 
+            class="form-control" 
+            placeholder="0x..." 
+          />
+        </div>
+
+        <!-- File Details Preview -->
+        <div class="file-preview" id="verifyFilePreview">
+          <div class="preview-row">
+            <span class="preview-label">File Checked:</span>
+            <span class="preview-value" id="verifyFileName">-</span>
+          </div>
+          <div class="preview-row">
+            <span class="preview-label">File Size:</span>
+            <span class="preview-value" id="verifyFileSize">-</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Calculated SHA-256 Hash:</label>
+            <div class="hash-box">
+              <span id="verifyComputedHash">0x...</span>
+              <button class="copy-btn" id="copyVerifyHash" title="Copy Hash">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert / Status -->
+        <div class="alert" id="verifyStatusAlert"></div>
+
+        <!-- Action Button -->
+        <div class="action-bar">
+          <button class="btn btn-primary" id="btnSubmitVerify">
+            <span>🔍</span>
+            <span id="verifyBtnText">Verify on Blockchain</span>
+          </button>
+        </div>
+
+        <!-- Result Status Cards -->
+        <!-- Authentic Case -->
+        <div class="result-card authentic" id="authenticResultCard">
+          <div class="result-header">
+            <span>✅</span>
+            <span>Authentic Document</span>
+          </div>
+          <p style="color: #a7f3d0; font-size: 0.95rem;">
+            This document's cryptographic hash is verified on the blockchain. The file is untampered and matches the certified timestamp and issuer.
+          </p>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-item-label">Document Title</div>
+              <div class="result-item-value" id="resultDocName">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-item-label">Notarization Timestamp</div>
+              <div class="result-item-value" id="resultTimestamp">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-item-label">Notarized By (Signer)</div>
+              <div class="result-item-value" id="resultIssuer" style="font-family: var(--font-mono); font-size: 0.85rem;">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-item-label">Integrity Status</div>
+              <div class="result-item-value" style="color: #34d399;">100% Valid & Untampered</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Unverified / Modified Case -->
+        <div class="result-card unverified" id="unverifiedResultCard">
+          <div class="result-header">
+            <span>❌</span>
+            <span>Unverified / Modified Document</span>
+          </div>
+          <p style="color: #fecaca; font-size: 0.95rem;">
+            Warning: The SHA-256 hash of this file does not exist on the smart contract registry. Either the file has been modified/tampered with, or it was never notarized on this blockchain.
+          </p>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-item-label">Checked Hash</div>
+              <div class="result-item-value" id="resultCheckedHash" style="font-family: var(--font-mono); font-size: 0.85rem;">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-item-label">Record Status</div>
+              <div class="result-item-value" style="color: #f87171;">Record Not Found (404)</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      Digital Notary DApp &bull; College Term-Work Demonstration &bull; Made by <strong>Aditya Kamble</strong> &bull; Powered by Solidity & Hardhat
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
