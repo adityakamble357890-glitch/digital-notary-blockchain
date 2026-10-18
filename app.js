@@ -649,9 +649,16 @@ async function handleVerifySubmit() {
     console.error("Verification error:", error);
     elements.btnSubmitVerify.disabled = false;
     elements.verifyBtnText.textContent = "Verify on Blockchain";
+
+    const message = String(error.reason || error.message || "");
+    let userMsg = "Ensure Hardhat node is running and contract address is correct.";
+    if (message.includes("could not decode result data") || message.includes("value=\"0x\"")) {
+      userMsg =
+        "No contract found at the configured address. Deploy with `npm run deploy` (Hardhat node must be running), then refresh the page.";
+    }
     showStatus(
       elements.verifyStatusAlert,
-      "Failed to query smart contract: " + (error.reason || error.message || "Ensure Hardhat node is running and contract address is correct."),
+      "Failed to query smart contract: " + userMsg,
       "danger"
     );
   }
